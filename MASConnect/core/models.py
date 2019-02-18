@@ -29,21 +29,6 @@ class Address(models.Model):
         return " ".join([ self.street_number, self.street1, self.city, str(self.zip)])
 
 
-class User(AbstractUser):
-    member_id = models.CharField(max_length=32, null=True, blank=True)
-    phone = PhoneNumberField(blank=True, null=True)
-    gender = models.CharField(max_length=16, choices=GENDERS, null=True, blank=True)
-    birth_year = models.PositiveIntegerField(null=True, blank=True)
-    member_status = models.BooleanField(null=True, blank=True)
-    member_since = models.DateField(null=True, blank=True)
-    timezone = models.CharField(choices=((tz, tz) for tz in pytz.all_timezones),
-                                max_length=128, null=True, blank=True)
-    address = models.OneToOneField(Address, null=True, blank=True, on_delete=models.SET_NULL)
-
-    @property
-    def full_name(self):
-        return self.first_name + " " + self.last_name
-
 
 class ContactInfo(models.Model):
     name = models.CharField(max_length=128)
@@ -56,6 +41,23 @@ class Chapter(models.Model):
     logo = models.ImageField(null=True, blank=True)
     metro_area = models.CharField(max_length=32, null=True, blank=True)
     contact_info = models.OneToOneField(ContactInfo, null=True, blank=True, on_delete=models.SET_NULL)
+    parent_chapter = models.ForeignKey("Chapter", null=True, blank=True,  on_delete=models.SET_NULL)
+
+class User(AbstractUser):
+    member_id = models.CharField(max_length=32, null=True, blank=True)
+    phone = PhoneNumberField(blank=True, null=True)
+    gender = models.CharField(max_length=16, choices=GENDERS, null=True, blank=True)
+    birth_year = models.PositiveIntegerField(null=True, blank=True)
+    member_status = models.BooleanField(null=True, blank=True)
+    member_since = models.DateField(null=True, blank=True)
+    timezone = models.CharField(choices=((tz, tz) for tz in pytz.all_timezones),
+                                max_length=128, null=True, blank=True)
+    address = models.OneToOneField(Address, null=True, blank=True, on_delete=models.SET_NULL)
+    main_chapter = models.ForeignKey(Chapter, on_delete=models.SET_NULL, null=True, blank=True)
+
+    @property
+    def full_name(self):
+        return self.first_name + " " + self.last_name
 
 
 class Center(models.Model):
@@ -68,15 +70,29 @@ class Center(models.Model):
 
 
 class Event(models.Model):
+    chapter = models.ManyToManyField(Chapter)
     center = models.ForeignKey(Center, on_delete=models.CASCADE)
+    name = models.CharField(max_length=256)
+    description = models.TextField(null=True, blank=True)
+    start_time = models.DateTimeField(null=True, blank=True)
+    end_time = models.DateTimeField(null=True, blank=True)
+    location = models.ForeignKey(Address, null=True, blank=True, on_delete=models.SET_NULL)
+    flyer = models.FileField(null=True, blank=True)
+    contact_info = models.ManyToManyField(ContactInfo)
+    social_media_link = models.URLField(blank=True, null=True)
+    extra_info = models.TextField(null=True, blank=True)
 
 
 class Channel(models.Model):
-    center = models.ForeignKey(Center, on_delete=models.CASCADE)
+    chapter = models.ForeignKey(Chapter, on_delete=models.CASCADE)
     name = models.CharField(max_length=128)
+    description = models.TextField(null=True, blank=True)
+    image = models.ImageField(null=True, blank=True)
+    is_private = models.BooleanField(default=True)
 
 
 class Message(models.Model):
     channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
