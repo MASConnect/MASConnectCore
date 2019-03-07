@@ -71,7 +71,7 @@ class Center(models.Model):
 
 class Event(models.Model):
     chapter = models.ManyToManyField(Chapter)
-    center = models.ForeignKey(Center, on_delete=models.CASCADE)
+    center = models.ForeignKey(Center, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=256)
     description = models.TextField(null=True, blank=True)
     start_time = models.DateTimeField(null=True, blank=True)
