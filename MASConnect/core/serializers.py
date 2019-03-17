@@ -7,6 +7,8 @@ from django.contrib.auth.hashers import make_password
 
 class UserSerializer(ModelSerializer):
 
+    fields = "__all__"
+
     class Meta:
         model = User
 
