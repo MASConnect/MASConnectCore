@@ -7,10 +7,11 @@ from django.contrib.auth.hashers import make_password
 
 class UserSerializer(ModelSerializer):
 
-    fields = "__all__"
+
 
     class Meta:
         model = User
+        fields = "__all__"
 
     def validate_password(self, value):
         return make_password(value)
