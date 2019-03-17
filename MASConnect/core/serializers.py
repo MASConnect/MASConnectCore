@@ -2,6 +2,7 @@ from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 from .models import User
 from rest_framework.authtoken.models import Token
+from django.contrib.auth.hashers import make_password
 
 
 class UserSerializer(ModelSerializer):
@@ -10,6 +11,5 @@ class UserSerializer(ModelSerializer):
         model = User
         exclude = ('password',)
 
-    def create(self, validated_data):
-        user = User.objects.create_user(**validated_data)
-        return user
+    def validate_password(self, value):
+        return make_password(value)
