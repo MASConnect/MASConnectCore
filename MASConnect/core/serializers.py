@@ -9,7 +9,6 @@ class UserSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        exclude = ('password',)
 
     def validate_password(self, value):
         return make_password(value)
