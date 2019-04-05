@@ -1,10 +1,11 @@
 from django.urls import include, path
 from rest_framework import routers
 from rest_framework.authtoken import views as token_views
-from .views import UserViewSet
+from .views import *
 
 router = routers.SimpleRouter()
 router.register(r'users', UserViewSet)
+router.register(r'chapters', ChapterViewSet)
 
 
 # Wire up our API using automatic URL routing.
